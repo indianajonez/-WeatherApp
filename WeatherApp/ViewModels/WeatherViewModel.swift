@@ -12,23 +12,28 @@ class WeatherViewModel: ObservableObject {
 
 
 
+
     private let service = WeatherAPIService()
     
     func loadWeather(for city: String) async {
         isLoading = true
+        defer { isLoading = false }
+
         do {
             let response = try await service.fetchForecast(for: city)
             self.forecastDays = response.forecast.forecastDays
             self.city = response.location.name
             self.country = response.location.country
-
-            self.locationName = "\(response.location.name), \(response.location.country)"
             self.errorMessage = nil
         } catch {
-            self.errorMessage = "Не удалось загрузить данные"
+            if let apiError = error as? WeatherAPIError {
+                self.errorMessage = apiError.localizedDescription
+            } else {
+                self.errorMessage = "Произошла неизвестная ошибка."
+            }
         }
-        isLoading = false
     }
+
 
     // Форматирование даты
     private let displayFormatter: DateFormatter = {

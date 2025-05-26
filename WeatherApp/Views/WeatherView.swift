@@ -110,5 +110,13 @@ struct WeatherView: View {
         .task {
             await viewModel.loadWeather(for: "Moscow")
         }
+        .alert("Ошибка", isPresented: Binding<Bool>(
+            get: { viewModel.errorMessage != nil },
+            set: { _ in viewModel.errorMessage = nil }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
     }
 }
