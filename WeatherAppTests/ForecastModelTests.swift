@@ -3,7 +3,13 @@ import XCTest
 @testable import WeatherApp
 
 final class ForecastModelTests: XCTestCase {
+    
+    // MARK: - ForecastResponse Parsing
+    
     func testForecastResponseParsing() throws {
+        
+        // MARK: Setup JSON
+        
         let json = """
         {
             "location": {
@@ -29,15 +35,27 @@ final class ForecastModelTests: XCTestCase {
         }
         """.data(using: .utf8)!
 
+        // MARK: Decode
+        
         let decoded = try JSONDecoder().decode(ForecastResponse.self, from: json)
+        
+        // MARK: Location Assertions
+        
         XCTAssertEqual(decoded.location.name, "Moscow")
         XCTAssertEqual(decoded.location.country, "Russia")
+        
+        // MARK: Forecast Assertions
+        
+        guard let firstDay = decoded.forecast.forecastDays.first else {
+            XCTFail("No forecastDays found")
+            return
+        }
 
-        let firstDay = decoded.forecast.forecastDays.first!
         XCTAssertEqual(firstDay.date, "2025-05-26")
         XCTAssertEqual(firstDay.dayInfo.condition.description, "Sunny")
-        XCTAssertEqual(firstDay.dayInfo.averageTempC, 21.3)
-        XCTAssertEqual(firstDay.dayInfo.maxWindKph, 27.7)
+        XCTAssertEqual(firstDay.dayInfo.averageTempC, 21.3, accuracy: 0.001)
+        XCTAssertEqual(firstDay.dayInfo.maxWindKph, 27.7, accuracy: 0.001)
         XCTAssertEqual(firstDay.dayInfo.averageHumidity, 58)
     }
 }
+

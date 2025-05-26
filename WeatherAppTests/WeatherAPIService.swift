@@ -2,8 +2,12 @@
 import XCTest
 @testable import WeatherApp
 
-final class WeatherAPIServiceTests: XCTestCase {
+// MARK: - WeatherAPIServiceTests
 
+final class WeatherAPIServiceTests: XCTestCase {
+    
+    // MARK: - Setup / Teardown
+    
     override class func setUp() {
         super.setUp()
         URLProtocol.registerClass(MockURLProtocol.self)
@@ -13,8 +17,13 @@ final class WeatherAPIServiceTests: XCTestCase {
         URLProtocol.unregisterClass(MockURLProtocol.self)
         super.tearDown()
     }
+    
+    // MARK: - Tests
 
     func testFetchForecastSuccess() async throws {
+        
+        // MARK: Given
+        
         let expectedJSON = """
         {
             "location": {
@@ -45,12 +54,26 @@ final class WeatherAPIServiceTests: XCTestCase {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         let session = URLSession(configuration: config)
-
         let service = WeatherAPIService(session: session)
+
+        // MARK: When
+        
         let response = try await service.fetchForecast(for: "Moscow")
 
+        // MARK: Then
+        
+        guard let firstDay = response.forecast.forecastDays.first else {
+            XCTFail("No forecast day found")
+            return
+        }
+
         XCTAssertEqual(response.location.name, "Moscow")
-        XCTAssertEqual(response.forecast.forecastDays.count, 1)
-        XCTAssertEqual(response.forecast.forecastDays.first?.dayInfo.condition.description, "Sunny")
+        XCTAssertEqual(response.location.country, "Russia")
+        XCTAssertEqual(firstDay.date, "2025-05-26")
+        XCTAssertEqual(firstDay.dayInfo.condition.description, "Sunny")
+        XCTAssertEqual(firstDay.dayInfo.averageTempC, 21.3, accuracy: 0.001)
+        XCTAssertEqual(firstDay.dayInfo.maxWindKph, 27.7, accuracy: 0.001)
+        XCTAssertEqual(firstDay.dayInfo.averageHumidity, 58)
     }
 }
+
