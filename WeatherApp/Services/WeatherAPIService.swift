@@ -1,9 +1,3 @@
-//
-//  WeatherAPIService.swift
-//  WeatherApp
-//
-//  Created by Ekaterina Saveleva on 26.05.2025.
-// "2821e58bf0004b10996100712252605"
 
 import Foundation
 
