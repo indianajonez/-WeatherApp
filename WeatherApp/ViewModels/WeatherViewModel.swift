@@ -55,14 +55,18 @@ class WeatherViewModel: ObservableObject {
         }
     }
     
-    func formattedDate(from string: String) -> String {
-        guard let date = inputDateFormatter.date(from: string) else { return string }
-        return fullDateFormatter.string(from: date)
-    }
-    
     func shortFormattedDate(from string: String) -> String {
         guard let date = inputDateFormatter.date(from: string) else { return string }
         return shortDateFormatter.string(from: date)
     }
+    
+    // MARK: - Private Methods
+    
+    private func formattedDate(from string: String) -> String {
+        guard let date = inputDateFormatter.date(from: string) else { return string }
+        return fullDateFormatter.string(from: date)
+    }
+    
+
 }
 
